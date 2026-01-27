@@ -1,0 +1,29 @@
+Profiles {
+    align: center middle;
+    color: #ffffff;
+    layout: vertical;
+}
+
+Profiles > Label {
+    background: #000000;
+    align: center middle;
+}
+
+Profiles > Button {
+    align: center middle;
+}
+
+ProfileCreation {
+    layout: vertical;
+    align: center middle;
+}
+
+#no-config-label {
+    content-align-horizontal: center;
+    text-style: reverse;
+}
+
+#create_btn {
+    align: center middle;
+    
+}
