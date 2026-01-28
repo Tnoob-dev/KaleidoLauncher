@@ -14,3 +14,8 @@ app.build/
 app.dist/
 
 *.xml
+
+build/
+dist/
+*.build/
+*.dist/
