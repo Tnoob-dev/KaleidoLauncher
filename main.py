@@ -9,7 +9,7 @@ import asyncio
 class MyApp(App):
     ENABLE_COMMAND_PALETTE = False
     
-    CSS_PATH = "./src/styles/ProfileScreen.tcss"
+    CSS_PATH = "./app/src/styles/ProfileScreen.tcss"
     
     BINDINGS = [("q, ctrl+c", "quit", "Cerrar"),
                 ("1", "change_theme('minecraft')", "Tema de Minecraft"),
