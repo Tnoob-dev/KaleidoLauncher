@@ -1,23 +1,43 @@
+from textual import work
 from textual.app import App, ComposeResult
-from textual.widgets import Footer, Header, Welcome, Label, Button, Static
-from textual import events
-from textual.screen import Screen
+from textual.widgets import Header
 from src.screens.ProfilesScreen import Profiles
-
+from src.themes.themes import MyThemes
+from src.utils.miscFunctions import createKaleidoFolder, whatPlatform
+import asyncio
 
 class MyApp(App):
+    ENABLE_COMMAND_PALETTE = False
     
     CSS_PATH = "./src/styles/ProfileScreen.tcss"
-    BINDINGS = [("q, ctrl+c", "quit", "Cerrar")]
+    
+    BINDINGS = [("q, ctrl+c", "quit", "Cerrar"),
+                ("1", "change_theme('minecraft')", "Tema de Minecraft"),
+                ("2", "change_theme('nether')", "Tema de Nether"),
+                ("3", "change_theme('end')", "Tema de End"),
+                ]
     TITLE = "Kaleido - Launcher"
     
     
     def compose(self) -> ComposeResult:
         yield Header()
-        yield Profiles()
-        yield Footer()
     
-            
+    @work
+    async def on_mount(self) -> None:
+        self.register_theme(MyThemes.minecraft_theme)
+        self.register_theme(MyThemes.nether_theme)
+        self.register_theme(MyThemes.end_theme)
+        
+        self.theme = "end"
+        
+        platformPath = whatPlatform()
+        
+        await asyncio.to_thread(createKaleidoFolder, platformPath)
+        self.push_screen(Profiles())
+        
+    def action_change_theme(self, themeName: str) -> None:        
+        self.theme = themeName
+        
 if __name__ == "__main__":
     app = MyApp()
     app.run()
