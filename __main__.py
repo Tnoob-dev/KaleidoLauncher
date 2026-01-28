@@ -1,9 +1,9 @@
 from textual import work
 from textual.app import App, ComposeResult
 from textual.widgets import Header
-from src.screens.ProfilesScreen import Profiles
-from src.themes.themes import MyThemes
-from src.utils.miscFunctions import createKaleidoFolder, whatPlatform
+from app.src.screens.ProfilesScreen import Profiles
+from app.src.themes.themes import MyThemes
+from app.src.utils.miscFunctions import createKaleidoFolder, whatPlatform
 import asyncio
 
 class MyApp(App):
