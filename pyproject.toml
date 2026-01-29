@@ -5,7 +5,6 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "kaleido-launcher"
 dynamic = ["version"]
-version = "0.0.1"
 description = "TUI launcher for Minecraft profiles with Textual"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -18,11 +17,13 @@ maintainers = [
 ]
 dependencies = [
     "aiohttp>=3.13.3",
+    "build>=1.4.0",
     "minecraft-launcher-lib>=8.0",
     "pydantic>=2.12.5",
     "pyinstaller>=6.18.0",
     "textual>=7.4.0",
     "textual-dev>=1.8.0",
+    "twine>=6.2.0",
 ]
 
 [project.scripts]
@@ -33,7 +34,6 @@ version = {attr = "app.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["app*"]
 
 [tool.setuptools.package-data]
 kaleido = ["py.typed"]
