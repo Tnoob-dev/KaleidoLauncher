@@ -1,12 +1,12 @@
 from textual import work
 from textual.app import App, ComposeResult
 from textual.widgets import Header
-from app.src.screens.ProfilesScreen import Profiles
-from app.src.themes.themes import MyThemes
-from app.src.utils.miscFunctions import createKaleidoFolder, whatPlatform
+from src.screens.ProfilesScreen import Profiles
+from src.themes.themes import MyThemes
+from src.utils.miscFunctions import createKaleidoFolder, whatPlatform
 import asyncio
 
-class MyApp(App):
+class Kaleido(App):
     ENABLE_COMMAND_PALETTE = False
     
     CSS = """
@@ -126,6 +126,9 @@ ProfileCreation {
     def action_change_theme(self, themeName: str) -> None:
         self.theme = themeName
         
-if __name__ == "__main__":
-    app = MyApp()
+def main():
+    app = Kaleido()
     app.run()
+    
+if __name__ == "__main__":
+    main()
