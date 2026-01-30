@@ -22,7 +22,7 @@ class Dashboard(Screen):
     def compose(self) -> ComposeResult:
         yield Container(
             Static(self.info_static, classes="info_static"),
-            Center(ProgressBar(total=100, show_eta=False, id="download_pb")),
+            Center(ProgressBar(total=100, show_eta=False, id="download_pb"), id="progress_container"),
             Horizontal(
                 Button(label="Instalar", id="install_btn", classes="button"),
                 Button(label="Jugar", id="play_btn", classes="button", disabled=True),
@@ -42,8 +42,8 @@ class Dashboard(Screen):
             installButton.disabled = True
             installButton.label = "Instalado"
             
-            verticalForPb = self.query_one("#progress_container", Vertical)
-            verticalForPb.add_class("hidden")
+            CenterForPb = self.query_one("#progress_container", Center)
+            CenterForPb.add_class("hidden")
             
     async def on_button_pressed(self, event: Button.Pressed):
         if event.button.id == "install_btn":
