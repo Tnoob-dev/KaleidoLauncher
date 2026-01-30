@@ -5,7 +5,7 @@ from textual.widgets import Label, Button, Input, Select, RadioSet, RadioButton
 from textual.containers import Horizontal, Vertical
 from pathlib import Path
 from ..mclib.mclib import get_mc_versions
-from ..utils.fileHandling import checkConfigExists
+from ..utils.fileHandling import checkPathExists
 from ..utils.typo import Profile
 from ..utils.miscFunctions import whatPlatform
 from ..profiles.profileManagement import addNewProfile, readProfiles
@@ -171,7 +171,7 @@ class Profiles(Screen):
         platform = whatPlatform()
         fullConfigPath = Path(platform / "kaleidoProfiles.json")
         
-        fileExists = checkConfigExists(fullConfigPath)
+        fileExists = checkPathExists(fullConfigPath)
             
 
         if not fileExists:
