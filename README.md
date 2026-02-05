@@ -142,8 +142,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 💻 Follow the project
 
-[Discord](https://discord.gg/9qMVSfWs)
-[Telegram](https://t.me/KaleidoMC)
+- [Discord](https://discord.gg/9qMVSfWs)
+- [Telegram](https://t.me/KaleidoMC)
 
 
 ## 🙏 Acknowledgments
