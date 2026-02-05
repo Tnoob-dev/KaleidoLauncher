@@ -1,54 +1,70 @@
 from textual import work
 from textual.app import ComposeResult
 from textual.screen import Screen
-from textual.widgets import Label, Button, Input, Select, RadioSet, RadioButton
+from textual.widgets import Label, Button, Input, Select, RadioSet, RadioButton, Header, Footer
 from textual.containers import Horizontal, Vertical
 from pathlib import Path
 from ..mclib.mclib import get_mc_versions
-from ..utils.fileHandling import checkPathExists
-from ..utils.typo import Profile
-from ..utils.miscFunctions import whatPlatform
-from ..profiles.profileManagement import addNewProfile, readProfiles
-from .DashboardScreen import Dashboard
+from ..db.dbCreation import ProfileTable
+from ..styles.Styles import Styles
+from ..utils.miscFunctions import whatPlatform, createUUID
+from ..profiles.profileManagement import addNewProfile, readProfiles, getProfileByUsername
 import asyncio
 
 class ProfileCreation(Screen):
+    
+    CSS = Styles.profileCreationStyles
+    
+    def __init__(self, name = None, id = None, classes = None):
+        self.platform = whatPlatform()
+        super().__init__(name, id, classes)
 
     def compose(self) -> ComposeResult:
+        yield Header()
+        yield Footer()
+        
         yield Vertical(
-        Horizontal(
-            Label("Nombre del perfil:", id="name_label"),
-            Input(placeholder="Steve", id="name_input").focus(),
-            Label("Versión:", id="version_label"),
-            Vertical(
-                Select([], prompt="", id="version_select"),
-                Label("", id="error_label", classes="hidden"),
-                
-                RadioSet(
+            Horizontal(
+                Label("Nombre del perfil:", id="name_label"),
+                Input(placeholder="Steve", id="name_input").focus(),
+                classes="form-row"
+            ),
+            Horizontal(
+                Label("Ubicacion:", id="ubi_label"),
+                Input(str(Path(self.platform)), id="ubi_input"),
+                classes="form-row"
+            ),
+            
+            Horizontal(
+                Label("Versión:", id="version_label"),
+                Vertical(
+                    Select([], prompt="", id="version_select"),
+                    Label("", id="error_label", classes="hidden"),
+                    Button("Reintentar", id="retry_connection_btn", classes="hidden"),
+                ),
+                classes="form-row"
+            ),
+            RadioSet(
                     RadioButton("Vanilla", value=True),
                     RadioButton("Fabric"),
                     RadioButton("Forge"),
                     id="radio_set_apis"
-                    ),
-                
-                Button("Reintentar", id="retry_connection_btn", classes="hidden"),
+                ),
+            Vertical(
+                Button("Crear", id="create_btn", disabled=True, classes="submit-btn"),
             ),
-            classes="form-row"
-        ),
-        # Create Button
-        Button("Crear", id="create_btn", disabled=True, classes="submit-btn"),
-        id="form-container"
-    )
+            id="form-container"
+        )
 
     @work   
     async def on_mount(self) -> None:
         
         selectVersionWidget = self.query_one("#version_select", Select)
         
-        platform = whatPlatform()
-        fullPath = Path(platform / ".minecraft")
         
-        releases = await asyncio.to_thread(get_mc_versions, fullPath)
+        tempPath = Path(self.platform)
+        
+        releases = await asyncio.to_thread(get_mc_versions, tempPath)
         
         if len(releases) > 0 :
             selectVersionWidget.set_options([(release, release) for release in releases])
@@ -59,10 +75,10 @@ class ProfileCreation(Screen):
     async def load_versions(self) -> None:
         
         try:
-            platform = whatPlatform()
-            fullPath = Path(platform / ".minecraft")
             
-            releases = await asyncio.to_thread(get_mc_versions, fullPath)
+            tempPath = Path(self.platform)
+            
+            releases = await asyncio.to_thread(get_mc_versions, tempPath)
             if releases:
                 self.query_one("#version_select", Select).set_options([(release, index) for index, release in enumerate(releases)])
                 self.update_ui_state("success")
@@ -129,16 +145,17 @@ class ProfileCreation(Screen):
         errorLabel = self.query_one("#error_label", Label)
         retryButton = self.query_one("#retry_connection_btn", Button)
         nameInput = self.query_one("#name_input", Input)
+        ubiInput = self.query_one("#ubi_input", Input)
         createButton = self.query_one("#create_btn", Button)
         selectVersionWidget = self.query_one("#version_select", Select)
         
-        platform = whatPlatform()
-        fullPath = Path(platform / ".minecraft")
+        
+        fullPath = Path(ubiInput.value)
         
         match event.button.id:
             case "retry_connection_btn":
                 
-                releases = await asyncio.to_thread(get_mc_versions ,fullPath)
+                releases = await asyncio.to_thread(get_mc_versions , fullPath)
                 
                 if len(releases) > 0:
                     selectVersionWidget.set_options([(release, index) for index, release in enumerate(releases)])
@@ -152,11 +169,15 @@ class ProfileCreation(Screen):
                     
                     selectVersionWidget.display = True
             case "create_btn":
-                profile = Profile(
-                    username=nameInput.value,
+                username = nameInput.value
+                
+                profile = ProfileTable(
+                    username=username,
                     version=selectVersionWidget.value,
                     api=self.get_selected_api(),
-                    minecraftPath=str(fullPath)
+                    minecraftPath=str(fullPath),
+                    uuid=createUUID(username),
+                    preferredTheme="end"
                 )
                 addNewProfile(profile)
                 
@@ -167,29 +188,35 @@ class ProfileCreation(Screen):
 
 class Profiles(Screen):
     
+    CSS = Styles.profileScreen
+    
     def compose(self) -> ComposeResult:
-        platform = whatPlatform()
-        fullConfigPath = Path(platform / "kaleidoProfiles.json")
+        profiles = readProfiles()
         
-        fileExists = checkPathExists(fullConfigPath)
-            
+        yield Header()
+        yield Footer()
 
-        if not fileExists:
-            yield Label("No existe archivo de configuracion", id="no_config_label")
+        if len(profiles) <= 0:
             yield Button("Crear Nuevo Perfil", id="create_profile_btn")
             return
-
-        self.profile = readProfiles(fullConfigPath)
         
-        yield Label("Selecciona un perfil")
-        yield Button(
-            label=self.profile.username,
-            id="enter_profile_btn"
-        )
+        for i in range(len(profiles)):
+            yield Button(
+                label=profiles[i].username,
+                id=f"enter_profile_btn{i}",
+                classes="profile_boxes"
+            )
+        
+        if len(profiles) < 9:
+            yield Button("Crear Nuevo Perfil", id="create_profile_btn")
     
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "create_profile_btn":
             self.app.push_screen(ProfileCreation())
-        elif event.button.id == "enter_profile_btn":
+        elif event.button.id.startswith("enter_profile_btn"):
+            username = str(event.button.label)
+            
+            self.profile = getProfileByUsername(username)
+            
+            from .DashboardScreen import Dashboard
             self.app.push_screen(Dashboard(self.profile))
-        

@@ -3,8 +3,7 @@ from minecraft_launcher_lib.install import install_minecraft_version
 from minecraft_launcher_lib.command import get_minecraft_command
 from pathlib import Path
 from typing import Dict
-from textual.widgets import Button
-from ..utils.miscFunctions import createMinecraftFolder
+from ..utils.miscFunctions import createMinecraftFolder, createUUID
 import subprocess
 import uuid
 
@@ -16,13 +15,13 @@ def get_mc_versions(mcPath: Path):
         if ver["type"] == "release"
     ][:40]
     
-def install_mc(version: str, path: Path, callback: Dict = None):
-    createMinecraftFolder()
+def install_mc(version: str, mcPath: Path, callback: Dict = None):
+    createMinecraftFolder(mcPath)
     
-    install_minecraft_version(version, path, callback)
+    install_minecraft_version(version, Path(mcPath / ".minecraft"), callback)
     
-def execute_mc(username: str, mcVersion: str, mcPath: Path):
-    player_uuid = str(uuid.uuid3(uuid.NAMESPACE_DNS, username))
+def execute_mc(username: str, mcVersion: str, mcPath: Path, player_uuid: str):
+    
     options = {
         "username": username,
         "uuid": player_uuid,
@@ -30,7 +29,7 @@ def execute_mc(username: str, mcVersion: str, mcPath: Path):
     }
     commands = get_minecraft_command(
         version=mcVersion,
-        minecraft_directory=mcPath,
+        minecraft_directory=Path(Path(mcPath) / ".minecraft"),
         options=options
     )
     

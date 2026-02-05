@@ -1,8 +1,7 @@
-import json
-from ..utils.typo import Profile
-from ..utils.miscFunctions import whatPlatform
-from typing import Dict
+from ..db.dbCreation import ProfileTable, engine
 from pathlib import Path
+from sqlmodel import Session, select
+from typing import Generator
 
 def checkProfileFileExistence(profilesPath: Path) -> bool:
     
@@ -18,33 +17,39 @@ def createProfileFile(profilesPath: Path) -> bool:
         
     return True
 
-def addNewProfile(profile: Profile) -> bool:
-    
-    platform = whatPlatform()
-    profilesPath = Path(platform) / "kaleidoProfiles.json"
-    
-    dataSchema = {
-        "username": profile.username,
-        "version": profile.version,
-        "api": profile.api,
-        "minecraftPath": profile.minecraftPath
-    }
-    
-    if not checkProfileFileExistence(profilesPath):
-        createProfileFile(profilesPath)
-    
-    with profilesPath.open("a+") as file:
-        json.dump(dataSchema, file, indent=4)
+def addNewProfile(profile: ProfileTable) -> bool:    
+    try:
+        with Session(engine) as session:
+            session.add(profile)
+            session.commit()
+    except Exception as e:
+        session.rollback()
+        raise str(e)
+            
+def readProfiles() -> Generator[ProfileTable]:
+    with Session(engine) as session:
+        statement = select(ProfileTable)
+        result = session.exec(statement).all()
         
-def readProfiles(profilesPath: Path) -> Profile:
-    
-    with profilesPath.open("r") as file:
-        
-        data = json.load(file)
-        
-    return Profile(
-        username=data["username"],
-        version=data["version"],
-        api=data["api"],
-        minecraftPath=data["minecraftPath"]
-    )
+        return [res for res in result]
+
+def getProfileByUsername(username: str) -> ProfileTable:
+    with Session(engine) as session:
+        statement = select(ProfileTable).where(ProfileTable.username == username)
+        user = session.exec(statement).first()
+
+        return user
+
+def deleteProfiles(username: str):
+    with Session(engine) as session:
+        try:
+            statement = select(ProfileTable).where(ProfileTable.username == username)
+
+            user = session.exec(statement).first()
+
+            session.delete(user)
+            session.commit()
+            
+        except Exception as e:
+            session.rollback()
+            raise str(e)

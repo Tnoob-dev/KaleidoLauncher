@@ -1,12 +1,13 @@
 from textual import work
 from textual.app import ComposeResult
 from textual.screen import Screen
-from textual.widgets import Label, Button, ProgressBar, Static
-from textual.containers import Vertical, Center, Horizontal, Container
+from textual.widgets import Button, ProgressBar, Static, Header, Footer
+from textual.containers import Center, Horizontal, Container
 from pathlib import Path
 from ..utils.typo import Profile
 from ..utils.fileHandling import checkPathExists, removeDir
 from ..mclib.mclib import install_mc, execute_mc
+from ..profiles.profileManagement import deleteProfiles
 from ..styles.Styles import Styles
 import asyncio
 
@@ -16,11 +17,33 @@ class Dashboard(Screen):
     
     def __init__(self, profile: Profile, name: str | None = None, id: str = None, classes: str = None):
         self.profile = profile
-        self.info_static = f"Bienvenido {self.profile.username}\nVersion seleccionada {self.profile.version}. API: {self.profile.api}"
+        
+        self.kl_ascii = """
+                ██╗  ██╗██╗
+                ██║ ██╔╝██║
+                █████╔╝ ██║
+                ██╔═██╗ ██║
+                ██║  ██╗███████╗
+                ╚═╝  ╚═╝╚══════╝
+"""
+        
+        self.info_static = f"""
+          Bienvenido {self.profile.username}
+Version seleccionada {self.profile.version}. API: {self.profile.api}\n{self.kl_ascii}
+Minecraft instalado en {self.profile.minecraftPath}
+"""
+
         super().__init__(name, id, classes)
     
-    def compose(self) -> ComposeResult:
+    def compose(self) -> ComposeResult:     
+        yield Header()
+        yield Footer()
+           
         yield Container(
+            Horizontal(    
+                Button("Regresar", id="go_back"),
+                Button("Eliminar Perfil", id="delete_profile")
+            ),
             Static(self.info_static, classes="info_static"),
             Center(ProgressBar(total=100, show_eta=False, id="download_pb"), id="progress_container"),
             Horizontal(
@@ -28,11 +51,11 @@ class Dashboard(Screen):
                 Button(label="Jugar", id="play_btn", classes="button", disabled=True),
                 classes="buttons"
             ),
-            id="dashboard"
+            classes="dashboard"
         )
 
     async def on_mount(self):
-        minecraftPathExists = await asyncio.to_thread(checkPathExists, Path(self.profile.minecraftPath))
+        minecraftPathExists = await asyncio.to_thread(checkPathExists, Path(Path(self.profile.minecraftPath) / ".minecraft"))
         
         if minecraftPathExists:
             playButton = self.query_one("#play_btn", Button)
@@ -46,13 +69,26 @@ class Dashboard(Screen):
             CenterForPb.add_class("hidden")
             
     async def on_button_pressed(self, event: Button.Pressed):
-        if event.button.id == "install_btn":
-            event.button.disabled = True
-            event.button.label = "Instalando..."
-            self.installMinecraft()
+        from .ProfilesScreen import Profiles
+        
+        match event.button.id:
+            case "install_btn":
+                event.button.disabled = True
+                event.button.label = "Instalando..."
+                self.installMinecraft()
             
-        elif event.button.id == "play_btn":
-            self.executeMinecraft()
+            case "play_btn":
+                self.executeMinecraft()
+            
+            case "go_back":
+                self.app.push_screen(Profiles())
+                
+            case "delete_profile":
+                deleteProfiles(self.profile.username)
+                self.notify("Perfil eliminado", severity="information", timeout=2)
+                self.app.push_screen(Profiles())
+                
+            
     
     @work(exclusive=True, thread=True)
     def installMinecraft(self):
@@ -76,7 +112,7 @@ class Dashboard(Screen):
             
             install_mc(
                 version=self.profile.version,
-                path=Path(self.profile.minecraftPath),
+                mcPath=Path(self.profile.minecraftPath),
                 callback=callback
             )
             
@@ -101,16 +137,18 @@ class Dashboard(Screen):
     @work(exclusive=True, thread=True)
     def executeMinecraft(self):
         try:
+            self.notify(f"Ejecutando Minecraft v{self.profile.version}", severity="information")
+            
             execute_mc(
                     username=self.profile.username,
                     mcVersion=self.profile.version,
-                    mcPath=self.profile.minecraftPath
+                    mcPath=self.profile.minecraftPath,
+                    player_uuid=self.profile.uuid
             )
-            self.notify(f"Ejecutando Minecraft v{self.profile.version}")
         
             self.app.call_from_thread(
                 lambda: self.notify("Minecraft cerrado", severity="information")
             )
             
         except Exception as e:
-            self.notify("Error al iniciar minecraft", severity="error")
+            self.notify(f"Error al iniciar minecraft -> {e}\n{self.profile.minecraftPath}", severity="error")

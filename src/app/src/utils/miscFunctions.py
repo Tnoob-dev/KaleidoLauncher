@@ -1,6 +1,7 @@
-import platform
 from pathlib import Path
+import platform
 import os
+import uuid
 
 def whatPlatform() -> Path:
     match platform.system().lower():
@@ -20,12 +21,35 @@ def createKaleidoFolder(path: Path) -> bool:
     path.mkdir()
     return True
 
-def createMinecraftFolder() -> bool:
+def createMinecraftFolder(mcPath: Path = None) -> bool:
     
-    pathToFolder = Path(whatPlatform() / ".minecraft")
+    if not mcPath:
+        pathToFolder = Path(whatPlatform() / ".minecraft")
+    
+    pathToFolder = Path(mcPath / ".minecraft")
     
     if pathToFolder.exists():
         return False
     
     pathToFolder.mkdir()
     return True
+
+def createUUID(username: str):
+    return str(uuid.uuid3(uuid.NAMESPACE_DNS, username))
+
+def changeTheme(newTheme: str):
+    
+    kaleidoPath = Path(whatPlatform() / ".theme")
+    
+    with kaleidoPath.open("w") as file:
+        file.write(newTheme)
+        
+def createLangFile(spanish = False, english = False):
+    
+    kaleidoPath = Path(whatPlatform() / ".lang")
+    
+    with kaleidoPath.open("w") as file:
+        if spanish and not english:
+                file.write("SPA")
+        elif english and not spanish:
+                file.write("ENG")

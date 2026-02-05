@@ -1,16 +1,17 @@
 from textual import work
 from textual.app import App, ComposeResult
-from textual.widgets import Header
+from textual.widgets import Header, Footer
 from app.src.screens.ProfilesScreen import Profiles
+from app.src.screens.SelectLanguageScreen import SelectLanguage
 from app.src.themes.themes import MyThemes
-from app.src.utils.miscFunctions import createKaleidoFolder, whatPlatform
-from app.src.styles.Styles import Styles
+from app.src.db.dbCreation import createDB
+from app.src.utils.miscFunctions import createKaleidoFolder, whatPlatform, changeTheme
+from pathlib import Path
 import asyncio
+
 
 class Kaleido(App):
     ENABLE_COMMAND_PALETTE = False
-    
-    CSS = Styles.profileScreen
     
     BINDINGS = [("q, ctrl+c", "quit", "Cerrar"),
                 ("1", "change_theme('minecraft')", "Tema de Minecraft"),
@@ -20,9 +21,9 @@ class Kaleido(App):
     
     TITLE = "Kaleido - Launcher"
     
-    
     def compose(self) -> ComposeResult:
         yield Header()
+        yield Footer()
     
     @work
     async def on_mount(self) -> None:
@@ -30,15 +31,30 @@ class Kaleido(App):
         self.register_theme(MyThemes.nether_theme)
         self.register_theme(MyThemes.end_theme)
         
-        self.theme = "end"
-        
         platformPath = whatPlatform()
         
         await asyncio.to_thread(createKaleidoFolder, platformPath)
-        self.push_screen(Profiles())
+        await asyncio.to_thread(createDB)
         
+        themePath = Path(platformPath / ".theme")
+        langPath = Path(platformPath / ".lang")
+        
+        if not themePath.exists():
+            with themePath.open("w") as file:
+                file.write("end")
+        
+        with themePath.open("r") as file:
+            self.theme = file.read()
+            
+        if not langPath.exists():
+            self.push_screen(SelectLanguage())
+            return
+        
+        self.push_screen(Profiles())
+    
     def action_change_theme(self, themeName: str) -> None:
         self.theme = themeName
+        changeTheme(themeName)
         
 def main():
     app = Kaleido()

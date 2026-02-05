@@ -1,11 +1,10 @@
 class Styles:
-    profileScreen: str = """
-/* Profile doesnt exists Screen */
-
+    profileScreen = """
 Profiles {
     align: center middle;
     color: #ffffff;
-    layout: vertical;
+    layout: grid;
+    grid-size: 3;
     text-style: none;
 }
 
@@ -24,19 +23,52 @@ Profiles > Label {
 }
 
 #create_profile_btn {
-    margin: 2 0 0 6;
     height: auto;
     background: transparent;
     color: #EAEFEF;
     text-style: none;
     border: round #EAEFEF;
 }
+"""
 
-/* Profile Creation Screen */
+    dashboardScreen = """
+.hidden {
+    display: none;
+}
 
+.dashboard {
+    background: $panel;
+    color: $text;
+}
+
+Button {
+    width: 1fr;
+    text-style: none;
+}
+
+.info_static {
+    text-style: bold;
+    height: auto;
+    content-align: center middle;
+    margin-bottom: 3;
+}
+
+.buttons {
+    width: 100%;
+    height: auto;
+    dock: bottom;
+}
+
+#download_pb {
+    height: auto;
+    margin: 2 0 0 0;
+    color: $accent;
+}
+"""
+
+    profileCreationStyles = """
 ProfileCreation {
     align: center middle;
-    padding: 0 -5;
 }
 
 #create_btn {
@@ -49,11 +81,15 @@ ProfileCreation {
 }
 
 #name_input {
-    width: 30%;
+    width: 50%;
 }
 
 #version_select {
-    width: auto;
+    width: 50%;
+}
+
+#ubi_input {
+    width: 50%;
 }
 
 .error_label {
@@ -84,47 +120,47 @@ ProfileCreation {
     margin: 1 0 0 0;
 }
 
+#ubi_label {
+    margin: 1 0 0 0;
+}
+
 #version_label {
     margin: 1 0 0 3;
 }
+
+#radio_set_apis {
+    margin: 0 0 0 40;
+    width: 30%;
+}
 """
 
-    dashboardScreen = """
+    language_styles = """
+    
+/* The same from the docs lol */
 
-.hidden {
-    display: none;
-}
-
-#dashboard {
+#dialog {
     height: 100%;
     margin: 4 8;
     background: $panel;
     color: $text;
     border: tall $background;
     padding: 1 2;
-    layout: vertical;
 }
 
 Button {
     width: 1fr;
+    text-style: none;
 }
 
-.info_static {
+.question {
     text-style: bold;
-    height: auto;
+    height: 100%;
     content-align: center middle;
-    margin-bottom: 2;
 }
 
 .buttons {
     width: 100%;
     height: auto;
     dock: bottom;
-}
-
-#download_pb {
-    height: auto;
-    margin: 2 0 0 0;
-    color: $accent;
 }
 """
