@@ -156,7 +156,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📊 Project Status
 
-**Current Version**: 0.0.5
+**Current Version**: 0.1.0
 
 Kaleido is under active development. New features and improvements are being added regularly.
 
