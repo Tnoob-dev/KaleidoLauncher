@@ -9,6 +9,7 @@ from ..db.dbCreation import ProfileTable
 from ..styles.Styles import Styles
 from ..utils.miscFunctions import whatPlatform, createUUID
 from ..profiles.profileManagement import addNewProfile, readProfiles, getProfileByUsername
+from ..langs.Languages import Langs
 import asyncio
 
 class ProfileCreation(Screen):
@@ -20,27 +21,29 @@ class ProfileCreation(Screen):
         super().__init__(name, id, classes)
 
     def compose(self) -> ComposeResult:
+        from app.cli import lang
+        
         yield Header()
         yield Footer()
         
         yield Vertical(
             Horizontal(
-                Label("Nombre del perfil:", id="name_label"),
+                Label(Langs.langsDict["profileUsernameLabel"][lang], id="name_label"),
                 Input(placeholder="Steve", id="name_input").focus(),
                 classes="form-row"
             ),
             Horizontal(
-                Label("Ubicacion:", id="ubi_label"),
-                Input(str(Path(self.platform)), id="ubi_input"),
+                Label(Langs.langsDict["pathLabel"][lang], id="ubi_label"),
+                Input(str(Path(self.platform) / ".minecraft"), id="ubi_input"),
                 classes="form-row"
             ),
             
             Horizontal(
-                Label("Versión:", id="version_label"),
+                Label(Langs.langsDict["versionLabel"][lang], id="version_label"),
                 Vertical(
                     Select([], prompt="", id="version_select"),
                     Label("", id="error_label", classes="hidden"),
-                    Button("Reintentar", id="retry_connection_btn", classes="hidden"),
+                    Button(Langs.langsDict["retryButton"][lang], id="retry_connection_btn", classes="hidden"),
                 ),
                 classes="form-row"
             ),
@@ -51,7 +54,7 @@ class ProfileCreation(Screen):
                     id="radio_set_apis"
                 ),
             Vertical(
-                Button("Crear", id="create_btn", disabled=True, classes="submit-btn"),
+                Button(Langs.langsDict["createButton"][lang], id="create_btn", disabled=True, classes="submit-btn"),
             ),
             id="form-container"
         )
@@ -73,7 +76,7 @@ class ProfileCreation(Screen):
     
     @work
     async def load_versions(self) -> None:
-        
+        from app.cli import lang
         try:
             
             tempPath = Path(self.platform)
@@ -83,9 +86,9 @@ class ProfileCreation(Screen):
                 self.query_one("#version_select", Select).set_options([(release, index) for index, release in enumerate(releases)])
                 self.update_ui_state("success")
             else:
-                self.update_ui_state("error", "No se pudo establecer conexion. Revise su conexion a internet")
+                self.update_ui_state("error", Langs.langsDict["connectionError"][lang])
         except (Exception, ConnectionError) as e:
-            self.update_ui_state("error", f"No se pudo establecer conexión: {str(e)}")
+            self.update_ui_state("error", Langs.langsDict["connectionErrorSeveral"][lang].format(error=str(e)))
 
     def update_ui_state(self, state: str, error_message: str = "") -> None:
         
@@ -175,7 +178,8 @@ class ProfileCreation(Screen):
                     username=username,
                     version=selectVersionWidget.value,
                     api=self.get_selected_api(),
-                    minecraftPath=str(fullPath),
+                    # verification for funny users lol
+                    minecraftPath=str(fullPath) if str(fullPath) != "." else str(Path(whatPlatform() / ".minecraft")),
                     uuid=createUUID(username),
                     preferredTheme="end"
                 )
@@ -191,13 +195,15 @@ class Profiles(Screen):
     CSS = Styles.profileScreen
     
     def compose(self) -> ComposeResult:
+        from app.cli import lang
+        
         profiles = readProfiles()
         
         yield Header()
         yield Footer()
 
         if len(profiles) <= 0:
-            yield Button("Crear Nuevo Perfil", id="create_profile_btn")
+            yield Button(Langs.langsDict["createButton"][lang], id="create_profile_btn")
             return
         
         for i in range(len(profiles)):
@@ -208,7 +214,7 @@ class Profiles(Screen):
             )
         
         if len(profiles) < 9:
-            yield Button("Crear Nuevo Perfil", id="create_profile_btn")
+            yield Button(Langs.langsDict["createButton"][lang], id="create_profile_btn")
     
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "create_profile_btn":

@@ -23,11 +23,21 @@ class SelectLanguage(Screen):
         )
         
     def on_button_pressed(self, event: Button.Pressed):
-        from .ProfilesScreen import Profiles
+        
         if event.button.id.startswith("english"):
             createLangFile(english=True)
-            self.app.push_screen(Profiles())
+            self.notify(
+                title="✅ Language Selected",
+                message="Kaleido will close, please restart it",
+                timeout=3
+            )
+            
         elif event.button.id.startswith("spanish"):
             createLangFile(spanish=True)
-            self.app.push_screen(Profiles())
-                
+            self.notify(
+                title="✅ Idioma Seleccionado",
+                message="Kaleido se cerrará, por favor reinicielo",
+                timeout=3
+            )
+        
+        self.set_timer(3, self.app.exit)

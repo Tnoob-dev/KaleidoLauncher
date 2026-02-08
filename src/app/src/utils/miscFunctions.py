@@ -1,7 +1,5 @@
 from pathlib import Path
-import platform
-import os
-import uuid
+import os, platform, uuid, subprocess, sys
 
 def whatPlatform() -> Path:
     match platform.system().lower():
@@ -50,6 +48,6 @@ def createLangFile(spanish = False, english = False):
     
     with kaleidoPath.open("w") as file:
         if spanish and not english:
-                file.write("SPA")
+            file.write("SPA")
         elif english and not spanish:
-                file.write("ENG")
+            file.write("ENG")

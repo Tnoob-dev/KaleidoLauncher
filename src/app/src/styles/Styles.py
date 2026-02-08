@@ -50,7 +50,6 @@ Button {
     text-style: bold;
     height: auto;
     content-align: center middle;
-    margin-bottom: 3;
 }
 
 .buttons {

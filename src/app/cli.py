@@ -9,14 +9,15 @@ from app.src.utils.miscFunctions import createKaleidoFolder, whatPlatform, chang
 from pathlib import Path
 import asyncio
 
+lang = "en"
 
 class Kaleido(App):
     ENABLE_COMMAND_PALETTE = False
     
-    BINDINGS = [("q, ctrl+c", "quit", "Cerrar"),
-                ("1", "change_theme('minecraft')", "Tema de Minecraft"),
-                ("2", "change_theme('nether')", "Tema de Nether"),
-                ("3", "change_theme('end')", "Tema de End"),
+    BINDINGS = [("q, ctrl+c", "quit", "Close"),
+                ("1", "change_theme('minecraft')", "Minecraft Theme"),
+                ("2", "change_theme('nether')", "Nether Theme"),
+                ("3", "change_theme('end')", "End Theme"),
                 ]
     
     TITLE = "Kaleido - Launcher"
@@ -50,6 +51,12 @@ class Kaleido(App):
             self.push_screen(SelectLanguage())
             return
         
+        global lang
+        
+        with langPath.open("r") as file:
+            if file.read().strip() == "SPA":
+                lang = "es"
+                            
         self.push_screen(Profiles())
     
     def action_change_theme(self, themeName: str) -> None:

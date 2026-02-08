@@ -1,11 +1,10 @@
-from minecraft_launcher_lib.utils import get_available_versions, generate_test_options
+from minecraft_launcher_lib.utils import get_available_versions
 from minecraft_launcher_lib.install import install_minecraft_version
 from minecraft_launcher_lib.command import get_minecraft_command
 from pathlib import Path
 from typing import Dict
-from ..utils.miscFunctions import createMinecraftFolder, createUUID
+from ..utils.miscFunctions import createMinecraftFolder
 import subprocess
-import uuid
 
 
 def get_mc_versions(mcPath: Path):
