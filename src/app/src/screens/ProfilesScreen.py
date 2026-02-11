@@ -7,7 +7,7 @@ from pathlib import Path
 from ..mclib.mclib import get_mc_versions
 from ..db.dbCreation import ProfileTable
 from ..styles.Styles import Styles
-from ..utils.miscFunctions import whatPlatform, createUUID
+from ..utils.miscFunctions import whatPlatform, createUUID, displayModLoaders
 from ..profiles.profileManagement import addNewProfile, readProfiles, getProfileByUsername
 from ..langs.Languages import Langs
 import asyncio
@@ -34,7 +34,7 @@ class ProfileCreation(Screen):
             ),
             Horizontal(
                 Label(Langs.langsDict["pathLabel"][lang], id="ubi_label"),
-                Input(str(Path(self.platform) / ".minecraft"), id="ubi_input"),
+                Input(str(Path(self.platform)), id="ubi_input"),
                 classes="form-row"
             ),
             
@@ -49,8 +49,11 @@ class ProfileCreation(Screen):
             ),
             RadioSet(
                     RadioButton("Vanilla", value=True),
-                    RadioButton("Fabric"),
-                    RadioButton("Forge"),
+                    # display every mod loader
+                    *[
+                        RadioButton(label=label.capitalize())
+                        for label in displayModLoaders()
+                    ],
                     id="radio_set_apis"
                 ),
             Vertical(
@@ -179,7 +182,7 @@ class ProfileCreation(Screen):
                     version=selectVersionWidget.value,
                     api=self.get_selected_api(),
                     # verification for funny users lol
-                    minecraftPath=str(fullPath) if str(fullPath) != "." else str(Path(whatPlatform() / ".minecraft")),
+                    minecraftPath=str(fullPath) if str(fullPath) != "." else str(Path(whatPlatform())),
                     uuid=createUUID(username),
                     preferredTheme="end"
                 )

@@ -28,8 +28,8 @@ class Langs:
             "es": "Instalar"
         },
         "startingInstallationStatus": {
-            "en": "Starting installation of Minecraft v{version}",
-            "es": "Iniciando instalación de Minecraft v{version}"
+            "en": "Starting installation of Minecraft v{version} {api}",
+            "es": "Iniciando instalación de Minecraft v{version} {api}"
         },
         "installingStatus": {
             "en": "Installing...",
