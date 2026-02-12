@@ -39,3 +39,18 @@ def deleteProfiles(username: str):
         except Exception as e:
             session.rollback()
             raise BaseException(e)
+
+def updateVersion(username: str, version: str):
+    with Session(engine) as session: 
+        try:
+            statement = select(ProfileTable).where(ProfileTable.username == username)
+            user = session.exec(statement).first()
+            
+            user.version = version
+            session.add(user)
+            
+            session.commit()
+            session.refresh(user)
+        except Exception as e:
+            session.rollback()
+            raise BaseException(e)        

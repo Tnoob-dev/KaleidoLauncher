@@ -29,8 +29,6 @@ def minecraftInstall(api: str, version: str, mcPath: Path, callback: CallbackDic
     
     _MOD_LOADER_FUNCTS[modLoader](version, mcPath, callback)
 
-    # install_minecraft_version(version, Path(mcPath / ".minecraft"), callback)
-
     
 def execute_mc(username: str, mcVersion: str, mcPath: Path, player_uuid: str) -> None:
 

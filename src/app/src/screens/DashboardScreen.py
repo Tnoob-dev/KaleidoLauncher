@@ -8,14 +8,17 @@ from pathlib import Path
 from typing import Optional
 from ..utils.typo import Profile
 from ..utils.fileHandling import checkPathExists, removeDir
+from ..utils.miscFunctions import getMinecraftVersion
 from ..mclib.mclib import minecraftInstall, execute_mc
-from ..profiles.profileManagement import deleteProfiles
+from ..profiles.profileManagement import deleteProfiles, updateVersion
 from ..styles.Styles import Styles
 from ..langs.Languages import Langs
 from app.cli import lang
 import asyncio
 
 class Dashboard(Screen):
+
+    BINDINGS = [("p", "profile_settings", "profile settings")]
 
     CSS = Styles.dashboardScreen
 
@@ -65,7 +68,11 @@ class Dashboard(Screen):
             ),
             classes="dashboard"
         )
-
+    
+    def action_profile_settings(self):
+        from .ProfilesScreen import ProfileSettings
+        self.app.push_screen(ProfileSettings())
+    
     async def on_mount(self):
         minecraftPathExists = await asyncio.to_thread(checkPathExists, Path(Path(self.profile.minecraftPath) / ".minecraft"))
 
@@ -88,6 +95,10 @@ class Dashboard(Screen):
                 event.button.disabled = True
                 event.button.label = Langs.langsDict["installingStatus"][lang]
                 self.installMinecraft()
+                version = getMinecraftVersion(self.profile.minecraftPath)
+                
+                if version != "vanilla":
+                    updateVersion(self.profile.username, version)
 
             case "play_btn":
                 self.executeMinecraft()

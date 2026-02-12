@@ -189,6 +189,13 @@ class ProfileCreation(Screen):
                 addNewProfile(profile)
                 
                 self.app.push_screen(Profiles())
+                
+##########################################################
+class ProfileSettings(Screen):
+    
+    def compose(self) -> ComposeResult:
+        yield Header()
+        yield Footer()
 
 
 ##########################################################

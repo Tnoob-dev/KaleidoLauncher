@@ -7,14 +7,10 @@ import uuid
 
 def whatPlatform() -> Path:
     match platform.system().lower():
-        case "linux":
+        case "linux" | "darwin":
             return Path.home() / "Kaleido"
         case "windows":
             return Path(os.getenv("APPDATA")) / "Kaleido"
-        case "darwin":
-            return Path.home() / "Kaleido"
-        case _:
-            raise OSError("Plataforma no soportada")
 
 def createKaleidoFolder(path: Path) -> bool:
     if path.exists():
@@ -58,3 +54,23 @@ def createLangFile(spanish = False, english = False):
 
 def displayModLoaders():
     return list_mod_loader()
+
+def getMinecraftVersion(path: Path) -> str:
+    
+    versionPath = Path(path) / Path(".minecraft") / Path("versions")
+    
+    versions = versionPath.iterdir()
+    
+    
+    keywords = ["forge", "neoforge", "fabric", "quilt"]
+    
+    modLoader = []
+    
+    for ver in versions:
+        modLoader.append(str(ver).split("/")[-1])
+    
+    if len(modLoader) >= 2:
+        modLoader.pop(0)
+        
+    for key in keywords:
+        return modLoader[0] if key in modLoader[0] else "vanilla"
