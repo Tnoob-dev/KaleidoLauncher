@@ -6,6 +6,7 @@ from minecraft_launcher_lib.types import CallbackDict, MinecraftOptions
 from pathlib import Path
 from typing import List
 from ..utils.miscFunctions import createMinecraftFolder
+from ..utils.miscFunctions import get_optimal_memory_allocation
 import subprocess
 
 def get_mc_versions(mcPath: Path) -> List[str]:
@@ -31,9 +32,16 @@ def minecraftInstall(api: str, version: str, mcPath: Path, callback: CallbackDic
 
     
 def execute_mc(username: str, mcVersion: str, mcPath: Path, player_uuid: str) -> None:
+    
+    memav = get_optimal_memory_allocation()
 
     options: MinecraftOptions = {
         "username": username,
+        "jvmArguments": [
+            f"-Xmx{memav}G",
+            f"-Xms{memav//2}G",
+            "-XX:+UseG1GC"
+        ],
         "uuid": player_uuid,
         "token": ""
     }

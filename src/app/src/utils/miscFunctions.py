@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Optional
 from minecraft_launcher_lib.mod_loader import list_mod_loader
 import os
+import psutil
 import platform
 import uuid
 
@@ -61,16 +62,21 @@ def getMinecraftVersion(path: Path) -> str:
     
     versions = versionPath.iterdir()
     
-    
-    keywords = ["forge", "neoforge", "fabric", "quilt"]
-    
     modLoader = []
     
     for ver in versions:
         modLoader.append(str(ver).split("/")[-1])
     
-    if len(modLoader) >= 2:
-        modLoader.pop(0)
+    if len(modLoader) < 2:
+        return "vanilla"
         
-    for key in keywords:
-        return modLoader[0] if key in modLoader[0] else "vanilla"
+    return modLoader[1]
+
+def get_optimal_memory_allocation():
+
+    available_ram = psutil.virtual_memory().available / (1024 ** 3)
+    
+    # use 70% of ram
+    optimal_ram = min(8.0, max(2.0, available_ram * 0.7))
+    
+    return int(optimal_ram)

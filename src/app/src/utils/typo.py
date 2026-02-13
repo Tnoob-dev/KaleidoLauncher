@@ -6,4 +6,3 @@ class Profile(BaseModel):
     api: str
     minecraftPath: str
     uuid: str
-    preferredTheme: str

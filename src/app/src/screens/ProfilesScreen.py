@@ -1,13 +1,14 @@
 from textual import work
 from textual.app import ComposeResult
 from textual.screen import Screen
-from textual.widgets import Label, Button, Input, Select, RadioSet, RadioButton, Header, Footer
+from textual.widgets import Label, Button, Input, Select, RadioSet, RadioButton, Header, Footer, Static
 from textual.containers import Horizontal, Vertical
 from pathlib import Path
 from ..mclib.mclib import get_mc_versions
 from ..db.dbCreation import ProfileTable
 from ..styles.Styles import Styles
 from ..utils.miscFunctions import whatPlatform, createUUID, displayModLoaders
+from ..utils.typo import Profile
 from ..profiles.profileManagement import addNewProfile, readProfiles, getProfileByUsername
 from ..langs.Languages import Langs
 import asyncio
@@ -189,15 +190,7 @@ class ProfileCreation(Screen):
                 addNewProfile(profile)
                 
                 self.app.push_screen(Profiles())
-                
-##########################################################
-class ProfileSettings(Screen):
     
-    def compose(self) -> ComposeResult:
-        yield Header()
-        yield Footer()
-
-
 ##########################################################
 
 class Profiles(Screen):

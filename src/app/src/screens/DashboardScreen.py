@@ -18,8 +18,6 @@ import asyncio
 
 class Dashboard(Screen):
 
-    BINDINGS = [("p", "profile_settings", "profile settings")]
-
     CSS = Styles.dashboardScreen
 
     def __init__(self, profile: Profile, name: str | None = None, id: Optional[str] = None, classes: Optional[str] = None):
@@ -69,10 +67,6 @@ class Dashboard(Screen):
             classes="dashboard"
         )
     
-    def action_profile_settings(self):
-        from .ProfilesScreen import ProfileSettings
-        self.app.push_screen(ProfileSettings())
-    
     async def on_mount(self):
         minecraftPathExists = await asyncio.to_thread(checkPathExists, Path(Path(self.profile.minecraftPath) / ".minecraft"))
 
@@ -95,10 +89,6 @@ class Dashboard(Screen):
                 event.button.disabled = True
                 event.button.label = Langs.langsDict["installingStatus"][lang]
                 self.installMinecraft()
-                version = getMinecraftVersion(self.profile.minecraftPath)
-                
-                if version != "vanilla":
-                    updateVersion(self.profile.username, version)
 
             case "play_btn":
                 self.executeMinecraft()
@@ -141,6 +131,12 @@ class Dashboard(Screen):
                 mcPath=Path(self.profile.minecraftPath),
                 callback=callback
             )
+            
+            version = getMinecraftVersion(self.profile.minecraftPath)
+                
+            if version != "vanilla":
+                updateVersion(self.profile.username, version)
+                self.profile.version = version
 
             def onSuccessEnableButton():
                 progressBar.show_bar = False
@@ -150,7 +146,7 @@ class Dashboard(Screen):
                             timeout=8)
 
             self.app.call_from_thread(onSuccessEnableButton)
-
+            
         except Exception as e:
             def showError():
                 installButton.disabled = False
