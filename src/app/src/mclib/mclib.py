@@ -14,7 +14,7 @@ def get_mc_versions(mcPath: Path) -> List[str]:
         ver["id"]
         for ver in get_available_versions(mcPath)
         if ver["type"] == "release"
-    ][:40]
+    ][:55]
 
 _MOD_LOADER_FUNCTS = {
     "vanilla": lambda version, mcPath, callback: install_minecraft_version(version, Path(mcPath) / ".minecraft", callback),
