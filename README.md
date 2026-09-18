@@ -6,7 +6,7 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.10--3.14-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.0.5-orange.svg)](https://github.com/Tnoob-dev/KaleidoLauncher)
+[![Version](https://img.shields.io/badge/version-0.1.0-orange.svg)](https://github.com/Tnoob-dev/KaleidoLauncher)
 
 </div>
 
